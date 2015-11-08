@@ -1,15 +1,14 @@
 var passport        = require('passport');
 var TokenStrategy   = require('passport-accesstoken').Strategy;
-var mysql 			= require('mysql');
+// var mysql 			= require('mysql');
 var bcrypt 			= require('bcrypt');
 var hat 			= require('hat');
 var CryptoJS 		= require("crypto-js");
 var config 			= require('../config');
+var connection 		= require('./db').buildDB();
 
-var connection = mysql.createConnection(config.db);
+
 var secret = config.secret;
-
-connection.connect();
 
 var strategyOptions = {
 	tokenHeader: 'x-auth-token',
@@ -31,22 +30,22 @@ passport.use(new TokenStrategy(strategyOptions,
 ));
 
 function decryptToken (token, cb) {
+	// var connection = mysql.createConnection(config.db);
+	// connection.connect();
 	var str = new Buffer(token, 'base64').toString('ascii');
 	var pieces = str.split('.');
 	var userid = pieces[0];
 	var encrypted = pieces[1];
 	var bytes = CryptoJS.AES.decrypt(encrypted.toString(), secret);
 	var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-	console.log(decryptedData);
 	if (userid == decryptedData.id){
-		connection.query('SELECT secret, id FROM users WHERE id=' + userid, function (err, rows, fields) {
+		connection.query('SELECT secret, id FROM user WHERE id=' + userid, function (err, rows, fields) {
 			if (err) throw err;
-			console.log(decryptedData.secret);
-			console.log(rows[0].secret);
 			if (decryptedData.secret === rows[0].secret){
-				console.log("TEST");
 				cb(null, rows[0].id);
-			} else return cb(false);
+			} else {
+				return cb(false);
+			}
 		});
 	} else return cb(false);
 };

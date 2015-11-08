@@ -12,6 +12,7 @@ var accountController      = require('./controllers/account');
 
 // Create our Express application
 var app = express();
+app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(passport.initialize());
@@ -49,7 +50,6 @@ router.route('/account')
   .post(authController.isAuthenticated, accountController.updateAccount)
   .get(authController.isAuthenticated, accountController.getAccount)
   .delete(authController.isAuthenticated, accountController.deleteAccount);
-
 
 // Register all our routes with /api
 app.use('/api', router);

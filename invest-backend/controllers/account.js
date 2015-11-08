@@ -1,9 +1,7 @@
-var mysql = require('mysql');
-var config = require('../config');
+var mysql 			= require('mysql');
+var config 			= require('../config');
+var connection 		= require('./db').buildDB();
 
-var connection = mysql.createConnection(config.db);
-
-connection.connect();
 
 exports.updateAccount = function updateAccount () {
 	// body...
