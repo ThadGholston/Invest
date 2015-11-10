@@ -1,11 +1,9 @@
 var passport        = require('passport');
 var TokenStrategy   = require('passport-accesstoken').Strategy;
-// var mysql 			= require('mysql');
-var bcrypt 			= require('bcrypt');
 var hat 			= require('hat');
 var CryptoJS 		= require("crypto-js");
 var config 			= require('../config');
-var connection 		= require('./db').buildDB();
+var mysql       	= require('mysql');
 
 
 var secret = config.secret;
@@ -30,8 +28,6 @@ passport.use(new TokenStrategy(strategyOptions,
 ));
 
 function decryptToken (token, cb) {
-	// var connection = mysql.createConnection(config.db);
-	// connection.connect();
 	var str = new Buffer(token, 'base64').toString('ascii');
 	var pieces = str.split('.');
 	var userid = pieces[0];
@@ -39,6 +35,8 @@ function decryptToken (token, cb) {
 	var bytes = CryptoJS.AES.decrypt(encrypted.toString(), secret);
 	var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 	if (userid == decryptedData.id){
+		var connection = mysql.createConnection(config.db);
+		connection.connect()
 		connection.query('SELECT secret, id FROM user WHERE id=' + userid, function (err, rows, fields) {
 			if (err) throw err;
 			if (decryptedData.secret === rows[0].secret){
@@ -47,6 +45,7 @@ function decryptToken (token, cb) {
 				return cb(false);
 			}
 		});
+		connection.end();
 	} else return cb(false);
 };
 

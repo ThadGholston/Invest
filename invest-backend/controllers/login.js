@@ -5,10 +5,6 @@ var hat 			= require('hat');
 var rack 			= hat.rack();
 var config 			= require('../config');
 var salt 			= config.salt;
-var connection 		= require('./db').buildDB();
-
-// Examples of how to use mysql at https://github.com/felixge/node-mysql
-connection.connect();
 
 // Create endpoint /api/login for POST
 exports.postLogin = function (req, res) {
@@ -19,9 +15,9 @@ exports.postLogin = function (req, res) {
 	var secret = rack();
 
 	// Examples of how to use bcrypt at https://github.com/ncb000gt/node.bcrypt.js/
-	var salt = bcrypt.genSaltSync(10);
-	var password_hash = bcrypt.hashSync(password, salt);
-	
+	var password_hash = bcrypt.hashSync(password, 10);
+	var connection = mysql.createConnection(config.db);
+	connection.connect()
 	connection.query('INSERT INTO user SET ?', {username: username, password_hash: password_hash, secret: secret, first_name: first_name, last_name: last_name}, function (err, result) {
 		if (err) {
 			console.log(err);
@@ -33,4 +29,6 @@ exports.postLogin = function (req, res) {
 			return res.json({token : token});
 		}
 	});
+	connection.end()
 }
+

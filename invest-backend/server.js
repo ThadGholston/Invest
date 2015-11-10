@@ -6,9 +6,12 @@ var bodyParser          = require('body-parser');
 var loginController     = require('./controllers/login');
 var authController      = require('./controllers/auth');
 var favoriteController  = require('./controllers/favorite');
-var stockController     = require('./controllers/stock');
+var graphController     = require('./controllers/graph');
 var newsController      = require('./controllers/news');
-var accountController      = require('./controllers/account');
+var accountController   = require('./controllers/account');
+var priceController     = require('./controllers/price');
+var logoutController    = require('./controllers/logout');
+var reauthController    = require('./controllers/reauth');
 
 // Create our Express application
 var app = express();
@@ -27,7 +30,7 @@ passport.deserializeUser(function (user, done) {
 });
 
 // Use environment defined port or 80
-var port = process.env.PORT || 3000;
+var port = 8080;
 
 // Create our Express router
 var router = express.Router();
@@ -35,21 +38,29 @@ var router = express.Router();
 router.route('/login')
   .post(loginController.postLogin);
 
-router.route('/favorite')
-  .get(authController.isAuthenticated, favoriteController.getFavorite)
-  .post(authController.isAuthenticated, favoriteController.postFavorite)
-  .delete(authController.isAuthenticated, favoriteController.deleteFavorite);
+router.route('/logout')
+  .post(authController.isAuthenticated, logoutController.getLogout);
 
-router.route('/stock/:ticker_symbol')
-  .get(stockController.getStock);
+// router.route('/favorite')
+//   .get(authController.isAuthenticated, favoriteController.getFavorite)
+//   .post(authController.isAuthenticated, favoriteController.postFavorite)
+//   .delete(authController.isAuthenticated, favoriteController.deleteFavorite);
+
+router.route('/graph/:symbol')
+  .get(graphController.getGraph);
+
+router.route('/price/:symbol')
+  .get(priceController.getPrice);
 
 router.route('/news')
   .get(newsController.getNews);
 
 router.route('/account')
   .post(authController.isAuthenticated, accountController.updateAccount)
-  .get(authController.isAuthenticated, accountController.getAccount)
-  .delete(authController.isAuthenticated, accountController.deleteAccount);
+  .get(authController.isAuthenticated, accountController.getAccount);
+
+router.route('/reauth')
+  .post(reauthController.postReauth);
 
 // Register all our routes with /api
 app.use('/api', router);

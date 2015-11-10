@@ -1,4 +1,3 @@
-var mysql 			= require('mysql');
 var request 		= require("request");
 var config 			= require('../config');
 var parseString 	= require('xml2js').parseString;
@@ -81,7 +80,6 @@ function convertPubDateToDateObj(pubDate){
 	if (month < 10) 
 		month = "0" + month
 	var dateString = parts[3] + "-" + month + "-" + parts[1] + "T" + parts[4]
-	console.log(dateString)
 	function getMonthFromString(mon){
    		return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
 	}

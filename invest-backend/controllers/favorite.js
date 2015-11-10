@@ -20,6 +20,7 @@ exports.postFavorite = function (req, res) {
 	connection.end();
 };
 
+
 exports.deleteFavorite = function (req, res) {
 	var connection = mysql.createConnection(config.db);
 	connection.connect();
