@@ -7,5 +7,6 @@
 
     <string name="title_section1">Stocks</string>
     <string name="title_section2">News</string>
+    <string name="title_activity_news">NewsActivity</string>
     <!--<string name="section_format">Hello World from section: %1$d</string>-->
 </resources>

@@ -6,4 +6,6 @@ package com.investmobile.invest;
 public class News {
     public String title;
     public String description;
+    public String publicationDate;
+    public String link;
 }

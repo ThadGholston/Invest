@@ -21,10 +21,6 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Authentication"
-            android:label="@string/title_activity_base_auth" >
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" >
@@ -33,6 +29,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".NewsActivity"
+            android:label="@string/title_activity_news"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>
 

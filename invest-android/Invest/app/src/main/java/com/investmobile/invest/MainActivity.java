@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
             switch (position){
                 case 0:
                     return new StockCardsFragment();
-//                    return GraphFragment.newInstance(position + 1);
                 case 1:
                     return new NewsListFragment();
                 default:
