@@ -29,29 +29,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.SignInButton;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A login screen that offers login via email/password and via Google+ sign in.
- * <p/>
- * ************ IMPORTANT SETUP NOTES: ************
- * In order for Google+ sign in to work with your app, you must first go to:
- * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
- * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
- */
 public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor> */{
 
     private final static String APP_AUTH_SHARED_PREFS = "auth_preferences";
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mUsernameView;
@@ -91,6 +83,7 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
             }
         });
 
+
         Button mUsernameLoginButton = (Button) findViewById(R.id.username_login_in_button);
         mUsernameLoginButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -99,15 +92,32 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
             }
         });
 
+        Button signUpButton = (Button) findViewById(R.id.signup_button);
+        signUpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, SignUpPageActivity.class);
+                intent.putExtra("login", true);
+                startActivity(intent);
+            }
+        });
+        
+        Button skipButton = (Button) findViewById(R.id.skip_button);
+        skipButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
+                sharedPrefs.edit().putBoolean("userSkippedLoggedInState", true).apply();
+                startActivity(intent);
+            }
+        });
+
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mEmailLoginFormView = findViewById(R.id.email_login_form);
     }
-
-//    private void populateAutoComplete() {
-//        getLoaderManager().initLoader(0, null, this);
-//    }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -115,9 +125,6 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mUsernameView.setError(null);
@@ -152,14 +159,14 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
+            RequestQueue queue = Volley.newRequestQueue(this);
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("ec2-52-2-91-221.compute-1.amazonaws.com/api/reauth", null, new MyCustomResponseListener(), new MyCustomErrorListener());
+            queue.add(jsonObjectRequest);
         }
     }
 
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() >= 8;
     }
 
@@ -199,122 +206,37 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
         }
     }
 
-    /**
-     * Check if the device supports Google Play Services.  It's best
-     * practice to check first rather than handling this as an error case.
-     *
-     * @return whether the device supports Google Play Services
-     */
-    private boolean supportsGooglePlayServices() {
-        return GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) ==
-                ConnectionResult.SUCCESS;
+    private void skipLogin() {
     }
 
-//    @Override
-//    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-//        return new CursorLoader(this,
-//                // Retrieve data rows for the device user's 'profile' contact.
-//                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-//                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-//
-//                // Select only email addresses.
-//                ContactsContract.Contacts.Data.MIMETYPE +
-//                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-//                .CONTENT_ITEM_TYPE},
-//
-//                // Show primary email addresses first. Note that there won't be
-//                // a primary email address if the user hasn't specified one.
-//                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-//    }
-
-//    @Override
-//    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-//        List<String> emails = new ArrayList<String>();
-//        cursor.moveToFirst();
-//        while (!cursor.isAfterLast()) {
-//            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-//            cursor.moveToNext();
-//        }
-//
-//        addEmailsToAutoComplete(emails);
-//    }
-
-//    @Override
-//    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-//
-//    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mUsernameView.setAdapter(adapter);
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        private String token;
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
+    private class MyCustomResponseListener implements Response.Listener<JSONObject>{
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
+        public void onResponse(JSONObject response) {
+            mProgressView.setVisibility(View.GONE);
+            String token = null;
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-            SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
-            if (success) {
+                SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
+                token = response.getString("token");
                 sharedPrefs.edit().putString("authToken", token).apply();
                 sharedPrefs.edit().putBoolean("userLoggedInState", true).apply();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
-            } else {
-                sharedPrefs.edit().putString("authToken", token).apply();
-                sharedPrefs.edit().putBoolean("userLoggedInState", false).apply();
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+            } catch (JSONException e) {
+                TextView errorTextView = (TextView) findViewById(R.id.error);
+                errorTextView.setVisibility(View.VISIBLE);
             }
+
         }
+    }
+
+    private class MyCustomErrorListener implements Response.ErrorListener{
 
         @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
+        public void onErrorResponse(VolleyError error) {
+            mProgressView.setVisibility(View.GONE);
+            TextView errorTextView = (TextView) findViewById(R.id.error);
+            errorTextView.setVisibility(View.VISIBLE);
         }
     }
 }

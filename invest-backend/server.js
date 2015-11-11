@@ -12,6 +12,7 @@ var accountController   = require('./controllers/account');
 var priceController     = require('./controllers/price');
 var logoutController    = require('./controllers/logout');
 var reauthController    = require('./controllers/reauth');
+var originalController  = require('./controllers/original');
 
 // Create our Express application
 var app = express();
@@ -61,6 +62,9 @@ router.route('/account')
 
 router.route('/reauth')
   .post(reauthController.postReauth);
+
+router.route('/original')
+  .post(originalController.postOriginal)
 
 // Register all our routes with /api
 app.use('/api', router);
