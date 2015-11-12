@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,19 +30,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor> */{
+public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor> */ {
 
     private final static String APP_AUTH_SHARED_PREFS = "auth_preferences";
 
@@ -69,8 +75,6 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
 
         // Set up the login form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.email);
-//        populateAutoComplete();
-
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -101,7 +105,7 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
                 startActivity(intent);
             }
         });
-        
+
         Button skipButton = (Button) findViewById(R.id.skip_button);
         skipButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -158,9 +162,22 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            mProgressView.setVisibility(View.VISIBLE);
+            mLoginFormView.setVisibility(View.GONE);
             RequestQueue queue = Volley.newRequestQueue(this);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("ec2-52-2-91-221.compute-1.amazonaws.com/api/reauth", null, new MyCustomResponseListener(), new MyCustomErrorListener());
+            StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, "http://ec2-52-2-91-221.compute-1.amazonaws.com/api/reauth", new MyCustomResponseListener(), new MyCustomErrorListener()) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Log.v("SignUpPage", "TEST");
+                    HashMap<String, String> map = new HashMap<>();
+                    String username = mUsernameView.getText().toString();
+                    String password = mPasswordView.getText().toString();
+                    map.put("username", username);
+                    map.put("password", password);
+                    return map;
+                }
+
+            };
             queue.add(jsonObjectRequest);
         }
     }
@@ -170,70 +187,82 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
         return password.length() >= 8;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
+//    /**
+//     * Shows the progress UI and hides the login form.
+//     */
+//    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+//    public void showProgress(final boolean show) {
+//        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+//        // for very easy animations. If available, use these APIs to fade-in
+//        // the progress spinner.
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+//            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+//
+//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+//            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+//                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+//                }
+//            });
+//
+//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+//            mProgressView.animate().setDuration(shortAnimTime).alpha(
+//                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+//                }
+//            });
+//        } else {
+//            // The ViewPropertyAnimator APIs are not available, so simply show
+//            // and hide the relevant UI components.
+//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+//        }
+//    }
 
     private void skipLogin() {
     }
 
-    private class MyCustomResponseListener implements Response.Listener<JSONObject>{
+    private class MyCustomResponseListener implements Response.Listener<String> {
 
         @Override
-        public void onResponse(JSONObject response) {
-            mProgressView.setVisibility(View.GONE);
+        public void onResponse(String response) {
             String token = null;
             try {
+                JSONObject object = new JSONObject(response);
                 SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
-                token = response.getString("token");
+                token = object.getString("token");
                 sharedPrefs.edit().putString("authToken", token).apply();
                 sharedPrefs.edit().putBoolean("userLoggedInState", true).apply();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             } catch (JSONException e) {
-                TextView errorTextView = (TextView) findViewById(R.id.error);
-                errorTextView.setVisibility(View.VISIBLE);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    String msg = object.getString("INVALID");
+                    mPasswordView.setError("Invalid password");
+                    mProgressView.setVisibility(View.GONE);
+                    mLoginFormView.setVisibility(View.VISIBLE);
+                } catch (JSONException e1) {
+                    mProgressView.setVisibility(View.GONE);
+                    mLoginFormView.setVisibility(View.VISIBLE);
+                    TextView errorTextView = (TextView) findViewById(R.id.error);
+                    errorTextView.setVisibility(View.VISIBLE);
+                }
+
             }
 
         }
     }
 
-    private class MyCustomErrorListener implements Response.ErrorListener{
+    private class MyCustomErrorListener implements Response.ErrorListener {
 
         @Override
         public void onErrorResponse(VolleyError error) {
+            mLoginFormView.setVisibility(View.VISIBLE);
             mProgressView.setVisibility(View.GONE);
             TextView errorTextView = (TextView) findViewById(R.id.error);
             errorTextView.setVisibility(View.VISIBLE);

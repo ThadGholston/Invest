@@ -38,7 +38,9 @@ exports.postReauth = function (req, res) {
 					connection.end();
 				});
 			} else {
-				return res.status(500).send({'errors':[{'message': 'Invalid password', 'code': 500}]});  
+				console.log("Mismatch");
+				connection.end();
+				return res.json({'INVALID':'INVALID'});  
 			}
 		}
 	});
