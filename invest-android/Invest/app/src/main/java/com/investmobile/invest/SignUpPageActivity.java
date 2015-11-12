@@ -22,6 +22,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
@@ -129,9 +130,10 @@ public class SignUpPageActivity extends AppCompatActivity {
                 // return value needs to be flipped issue with backend. will fix later
                 if (isValid) {
                     RequestQueue queue = Volley.newRequestQueue(SignUpPageActivity.this);
-                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, "http://ec2-52-2-91-221.compute-1.amazonaws.com/api/login", new MyCustomResponseListener(), new MyCustomErrorListener()) {
+                    StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, "http://ec2-52-2-91-221.compute-1.amazonaws.com/api/login", new MyCustomResponseListener(), new MyCustomErrorListener()) {
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
+                            Log.v("SignUpPage", "TEST");
                             HashMap<String, String> map = new HashMap<>();
                             String firstName = firstNameEditText.getText().toString();
                             String lastName = lastNameEditText.getText().toString();
@@ -164,15 +166,16 @@ public class SignUpPageActivity extends AppCompatActivity {
         }
     }
 
-    private class MyCustomResponseListener implements Response.Listener<JSONObject> {
+    private class MyCustomResponseListener implements Response.Listener<String> {
 
         @Override
-        public void onResponse(JSONObject response) {
+        public void onResponse(String response) {
             progressBar.setVisibility(View.GONE);
             String token = null;
             try {
                 SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
-                token = response.getString("token");
+                JSONObject obj = new JSONObject(response);
+                token = obj.getString("token");
                 sharedPrefs.edit().putString("authToken", token).apply();
                 sharedPrefs.edit().putBoolean("userLoggedInState", true).apply();
                 Intent intent = new Intent(SignUpPageActivity.this, MainActivity.class);
