@@ -13,6 +13,7 @@ var priceController     = require('./controllers/price');
 var logoutController    = require('./controllers/logout');
 var reauthController    = require('./controllers/reauth');
 var originalController  = require('./controllers/original');
+var searchController    = require('./controllers/search');
 
 // Create our Express application
 var app = express();
@@ -42,10 +43,10 @@ router.route('/login')
 router.route('/logout')
   .post(authController.isAuthenticated, logoutController.getLogout);
 
-// router.route('/favorite')
-//   .get(authController.isAuthenticated, favoriteController.getFavorite)
-//   .post(authController.isAuthenticated, favoriteController.postFavorite)
-//   .delete(authController.isAuthenticated, favoriteController.deleteFavorite);
+router.route('/favorite')
+  .get(authController.isAuthenticated, favoriteController.getFavorite)
+  .post(authController.isAuthenticated, favoriteController.postFavorite)
+  .put(authController.isAuthenticated, favoriteController.deleteFavorite);
 
 router.route('/graph/:symbol')
   .get(graphController.getGraph);
@@ -64,7 +65,10 @@ router.route('/reauth')
   .post(reauthController.postReauth);
 
 router.route('/original')
-  .post(originalController.postOriginal)
+  .post(originalController.postOriginal);
+
+router.route('/search/:query')
+  .get(searchController.getSearch);
 
 // Register all our routes with /api
 app.use('/api', router);

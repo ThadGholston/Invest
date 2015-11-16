@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -145,6 +143,8 @@ public class SignUpPageActivity extends AppCompatActivity {
                             map.put("password", password);
                             return map;
                         }
+
+
                     };
                     queue.add(jsonObjectRequest);
                 } else {
@@ -178,7 +178,7 @@ public class SignUpPageActivity extends AppCompatActivity {
                 token = obj.getString("token");
                 sharedPrefs.edit().putString("authToken", token).apply();
                 sharedPrefs.edit().putBoolean("userLoggedInState", true).apply();
-                Intent intent = new Intent(SignUpPageActivity.this, MainActivity.class);
+                Intent intent = new Intent(SignUpPageActivity.this, MainFragment.class);
                 startActivity(intent);
             } catch (JSONException e) {
                 setServerError();

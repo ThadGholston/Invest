@@ -30,13 +30,13 @@ exports.updateAccount  = function (req, res) {
 						var token = authController.createToken({id: user, secret: secret});
 						return res.json({token: token});
 					} else {
-						return res.status(500).send({'errors':[{'message': 'Internal Server Error', 'code': 500}]}); 
+						return res.status(401).send({'errors':[{'message': 'Internal Server Error', 'code': 401}]}); 
 					}
 				}
-				connection.end()
 			});
+			connection.end();
 		} else {
-			return res.status(500).send({'errors':[{'message': 'Invalid password', 'code': 500}]});  
+			return res.status(401).send({'errors':[{'message': 'Invalid password', 'code': 401}]});  
 		}
 	});
 	

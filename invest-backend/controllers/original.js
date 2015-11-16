@@ -14,4 +14,5 @@ exports.postOriginal = function (req, res) {
 		}
 		
 	});
+	connection.end();
 }

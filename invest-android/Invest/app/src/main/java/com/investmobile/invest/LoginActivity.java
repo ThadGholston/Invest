@@ -1,30 +1,17 @@
 package com.investmobile.invest;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-
 import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,16 +22,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor> */ {
@@ -67,7 +51,7 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
         boolean isUserLoggedIn = sharedPrefs.getBoolean("userLoggedInState", false);
         if (isUserLoggedIn) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, MainFragment.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -110,7 +94,7 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
         skipButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, MainFragment.class);
                 SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(APP_AUTH_SHARED_PREFS, Context.MODE_PRIVATE);
                 sharedPrefs.edit().putBoolean("userSkippedLoggedInState", true).apply();
                 startActivity(intent);
@@ -237,7 +221,7 @@ public class LoginActivity extends Activity /*implements LoaderCallbacks<Cursor>
                 token = object.getString("token");
                 sharedPrefs.edit().putString("authToken", token).apply();
                 sharedPrefs.edit().putBoolean("userLoggedInState", true).apply();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, MainFragment.class);
                 startActivity(intent);
             } catch (JSONException e) {
                 try {

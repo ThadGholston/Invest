@@ -1,0 +1,31 @@
+^TA100| 
+^CCSI|CMA
+^AORD|All Ordinaries
+^SSEC|Shanghai Composite
+^HSI|Hang Seng
+^BSESN|BSE 30
+^JKSE|Jakarta Composite
+^KLSE|KLSE Composite
+^N225|Nikkei 225
+^NZ50|NZSE 50
+^STI|Straits Times
+^KS11|Seoul Composite
+^TWII|Taiwan Weighted
+^MERV|MerVal
+^BVSP|Bovespa
+^GSPTSE|S&P TSX Composite
+^MXX|IPC
+^GSPC|500 Index
+^ATX|ATX
+^BFX|BEL-20
+^FCHI|CAC 40
+^GDAXI|DAX|10
+^OSEAX|OSE All Share
+^MIBTEL|MIBTel
+^IXX|ISE National-100
+^OMXSPI|Stockholm General
+^SSMI|Swiss Market
+^FTSE|FTSE 100
+FPXAA.PR|PX Index
+MICEXINDEXCF.ME|MICEX Index
+GD.AT|Athex Composite Share Price Index

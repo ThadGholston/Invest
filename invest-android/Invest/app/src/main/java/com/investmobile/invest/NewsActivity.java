@@ -22,8 +22,7 @@ public class NewsActivity extends AppCompatActivity {
         title = intent.getStringExtra("title");
         link = intent.getStringExtra("link");
         setContentView(R.layout.activity_news);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        setTitle("Invest");
         TextView textView = (TextView) findViewById(R.id.newsTitle);
         textView.setLines(1);
         textView.setText(title);
